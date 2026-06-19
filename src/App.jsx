@@ -10,27 +10,13 @@ function App() {
 
     return (
         <div>
+            <div id={"canvas-background"} />
             <Navbar/>
             <CanvasScene/>
             <div id={"Top"}>
                 {/*<div className={"gradientDown"}/>*/}
                 <div id={"title"}>
                     <img src={"Logo.png"}/>
-                </div>
-                <div className={"gradientUp"}/>
-            </div>
-            <div className={"content-container"}>
-            <div className={"content"}>
-                    <div className={"imp"}>
-                        <b>Game developer and designer.</b>
-                    </div>
-                    <div className={"centered"}>
-                        <ImageCarousel/>
-                    </div>
-                    <div className={"imp"}>
-                        <b>Current projects</b>
-                    </div>
-                    <GameInfo/>
                 </div>
             </div>
         </div>
