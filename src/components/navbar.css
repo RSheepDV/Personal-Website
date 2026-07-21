@@ -16,10 +16,11 @@
     width: 100%;
     padding: 40px 36px;
     z-index: 100;
-    transform: translateY(-100%);
+    transform: translateY(0);
 
     transition: transform 0.3s;
-    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(8px);
 
     font-family: 'Arial', sans-serif;
 }
@@ -29,10 +30,31 @@
     text-align: center;
     color: white;
     text-decoration: none;
-    width: 5lh;
+    min-width: 5lh;
 }
 
 #navigationBar a:hover{
     color: #dfd2a6;
     text-decoration: none;
+}
+
+#navigationBar img{
+    height: 42px;
+    width: auto;
+}
+
+@media (max-width: 700px) {
+    #navigationBar{
+        gap: 16px;
+        padding: 24px 16px;
+    }
+
+    #navigationBar a{
+        font-size: 1rem;
+        min-width: auto;
+    }
+
+    #navigationBar img{
+        height: 34px;
+    }
 }

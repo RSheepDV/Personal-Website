@@ -16,9 +16,21 @@ function App() {
             <div id={"Top"}>
                 {/*<div className={"gradientDown"}/>*/}
                 <div id={"title"}>
-                    <img src={"Logo.png"}/>
+                    <img src={"Logo.png"} alt={"MUWUN logo"}/>
                 </div>
             </div>
+            <section id={"about"} className={"content-container"}>
+                <h1>About Me</h1>
+                <div className={"centered"}>
+                    <GameInfo/>
+                </div>
+            </section>
+            <section id={"projects"} className={"content-container"}>
+                <h1>Projects</h1>
+                <div className={"centered"}>
+                    <ImageCarousel/>
+                </div>
+            </section>
         </div>
     )
 }
