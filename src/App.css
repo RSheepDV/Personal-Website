@@ -5,18 +5,47 @@ App{
     padding: 0;
 }
 
+.tv-page-host {
+    width: 960px;
+    height: 576px;
+    overflow: hidden;
+    background: #101820;
+}
+
+#live-page {
+    position: relative;
+    width: 960px;
+    height: 576px;
+    overflow: hidden;
+}
+
+.tv-page-host #Top {
+    height: 576px;
+}
+
+.tv-page-host .title-orbit,
+.tv-page-host .title-flip {
+    width: 400px;
+}
+
+.tv-page-host .title-flip,
+.tv-page-host .title-flip-button,
+.tv-page-host .title-flip-inner {
+    min-height: 100px;
+}
+
 #canvas-background {
     position: fixed;
     inset: 0;
-    z-index: -1;
-    background:
-        radial-gradient(
-                ellipse at top,
-                #025F78bb 0%,
-                #04263499 45%,
-                #01111b44 75%,
-                #00070c00 100%
-        );
+    z-index: -2;
+    /*background:*/
+    /*    radial-gradient(*/
+    /*            ellipse at bottom,*/
+    /*            #ffffff66 0%,*/
+    /*            #66666655 45%,*/
+    /*            #11111126 75%,*/
+    /*            #00000000 100%*/
+    /*    );*/
 }
 
 #canvas-background::after{
@@ -26,12 +55,87 @@ App{
 
     background: url("/noise.png") repeat;
 
-    opacity: 0.069;
-    mask-image: radial-gradient(circle at top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
-    -webkit-mask-image: radial-gradient(circle at top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+    opacity: 0.039;
+    mask-image: radial-gradient(circle at bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-image: radial-gradient(circle at bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
     mix-blend-mode: overlay;
 
     pointer-events: none;
+}
+
+/* Collage background behind all other backgrounds */
+#collage-background {
+    position: fixed;
+    inset: 0;
+    z-index: -2; /* sits behind #canvas-background (z-index -1) */
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#collage-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    opacity: 0.12;
+    mix-blend-mode: screen;
+    animation: collage-scroll 0s linear infinite;
+}
+
+#collage-track img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    object-fit: cover;
+    filter: contrast(1.02) saturate(0.9) grayscale(10%);
+}
+
+#collage-track img:nth-child(1),
+#collage-track img:nth-child(7) {
+    clip-path: polygon(0 0, 18% 0, 6% 100%, 0 100%);
+}
+
+#collage-track img:nth-child(2),
+#collage-track img:nth-child(8) {
+    clip-path: polygon(18% 0, 36% 0, 24% 100%, 6% 100%);
+}
+
+#collage-track img:nth-child(3),
+#collage-track img:nth-child(9) {
+    clip-path: polygon(36% 0, 54% 0, 42% 100%, 24% 100%);
+}
+
+#collage-track img:nth-child(4),
+#collage-track img:nth-child(10) {
+    clip-path: polygon(54% 0, 72% 0, 60% 100%, 42% 100%);
+}
+
+#collage-track img:nth-child(5),
+#collage-track img:nth-child(11) {
+    clip-path: polygon(72% 0, 90% 0, 78% 100%, 60% 100%);
+}
+
+#collage-track img:nth-child(6),
+#collage-track img:nth-child(12) {
+    clip-path: polygon(90% 0, 100% 0, 100% 100%, 78% 100%);
+}
+
+#collage-track img:nth-child(n + 7) {
+    left: 50%;
+}
+
+@keyframes collage-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@keyframes collage-float {
+    0% { transform: translateY(-4%); }
+    50% { transform: translateY(4%); }
+    100% { transform: translateY(-4%); }
 }
 
 #Top{
@@ -111,7 +215,7 @@ App{
     aspect-ratio: 1 / 1;
     pointer-events: none;
     z-index: 1;
-    animation: ring-rotate 30s linear infinite;
+    animation: ring-rotate 30s linear infinite reverse;
 }
 
 .title-ring svg {
@@ -254,4 +358,3 @@ App{
 /*    90% {filter: hue-rotate(384deg)}*/
 /*    100% {filter: hue-rotate(360deg)}*/
 /*}*/
-
