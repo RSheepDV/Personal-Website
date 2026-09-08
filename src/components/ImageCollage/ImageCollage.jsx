@@ -1,26 +1,62 @@
 import { useEffect, useRef } from 'react'
 import './ImageCollage.css'
 
+const designImageModules = import.meta.glob(
+    '/public/DesignTitle/*.{png,jpg,jpeg,webp,gif}',
+    { eager: true, query: '?url', import: 'default' }
+);
+const engineeringImageModules = import.meta.glob(
+    '/public/EngineeringTitle/*.{png,jpg,jpeg,webp,gif}',
+    { eager: true, query: '?url', import: 'default' }
+);
+
+function sortImageModules(imageModules) {
+    return Object.entries(imageModules)
+    .sort(([firstPath], [secondPath]) => firstPath.localeCompare(secondPath, undefined, { numeric: true }))
+    .map(([, imageUrl]) => imageUrl);
+}
+
+const collageFolderImages = {
+    DesignTitle: sortImageModules(designImageModules),
+    EngineeringTitle: sortImageModules(engineeringImageModules)
+};
+
 function ImageCollage({
     images,
-    columns = images.length,
+    folder = 'DesignTitle',
+    transitionFolder,
+    columns = 2,
     duration = 45,
-    parallaxStrength = 18,
+    minParallaxStrength = 0,
+    maxParallaxStrength = 18,
     separatorWidth = '3rem',
+    diagonalSlant = 20,
+    visible = true,
+    transitionActive = false,
 }) {
-    const imageSet = Array.from(
-        { length: columns },
-        (_, index) => images[index % images.length]
-    );
-    const repeatedImages = [...imageSet, ...imageSet];
+    const folderImages = collageFolderImages[folder] || collageFolderImages.DesignTitle;
+    const activeImages = images || folderImages;
+    const transitionImages = transitionFolder
+        ? collageFolderImages[transitionFolder] || []
+        : [];
+    const visibleColumns = Math.max(1, columns);
+    const repeatedImages = [...activeImages, ...activeImages];
+    const slant = Math.max(0, Math.min(diagonalSlant, 45));
+    const frameWidth = 100 + slant * 2;
     const tileRefs = useRef([]);
     const previousLefts = useRef([]);
     const imageStrengths = useRef([]);
     const collageStyle = {
-        '--collage-columns': columns,
         '--collage-total-tiles': repeatedImages.length,
+        '--collage-track-width': `${(repeatedImages.length / visibleColumns) * 100}%`,
         '--collage-duration': `${duration}s`,
         '--collage-separator-width': separatorWidth,
+        '--collage-frame-width': `${frameWidth}%`,
+        '--collage-frame-offset': `${-slant}%`,
+        '--collage-frame-top-left': `${(slant / frameWidth) * 100}%`,
+        '--collage-frame-top-right': `${((100 + slant) / frameWidth) * 100}%`,
+        '--collage-frame-bottom-right': `${(100 / frameWidth) * 100}%`,
+        '--collage-diagonal-bottom': `${100 - slant}%`,
     };
 
     useEffect(() => {
@@ -43,9 +79,12 @@ function ImageCollage({
                 const isEnteringFromRight = previousLeft === undefined
                     ? tileRect.left <= viewportRight
                     : previousLeft > viewportRight && tileRect.left <= viewportRight;
+                const minStrength = Math.max(0, Math.min(minParallaxStrength, maxParallaxStrength));
+                const maxStrength = Math.max(minStrength, maxParallaxStrength);
 
                 if (isEnteringFromRight && imageStrengths.current[index] === undefined) {
-                    imageStrengths.current[index] = Math.random() * Math.max(parallaxStrength, 0);
+                    imageStrengths.current[index] = minStrength
+                        + Math.random() * (maxStrength - minStrength);
                 }
 
                 tile.style.setProperty(
@@ -61,12 +100,21 @@ function ImageCollage({
         frameId = requestAnimationFrame(updateParallax);
 
         return () => cancelAnimationFrame(frameId);
-    }, [columns, parallaxStrength, repeatedImages.length]);
+    }, [minParallaxStrength, maxParallaxStrength, repeatedImages.length]);
 
     return (
-        <div className="image-collage" style={collageStyle} aria-hidden="true">
+        <div
+            className={`image-collage${visible ? ' image-collage--visible' : ''}${transitionFolder && transitionActive ? ' image-collage--transitioning' : ''}`}
+            style={collageStyle}
+            aria-hidden="true"
+        >
             <div className="image-collage__track">
-                {repeatedImages.map((image, index) => (
+                {repeatedImages.map((image, index) => {
+                    const transitionImage = transitionImages.length > 0
+                        ? transitionImages[index % transitionImages.length]
+                        : null;
+
+                    return (
                     <div
                         className="image-collage__tile"
                         key={`${image}-${index}`}
@@ -75,10 +123,14 @@ function ImageCollage({
                         }}
                     >
                         <div className="image-collage__frame">
-                            <img src={`/DesignTitle/${image}`} alt="" />
+                            <img className="image-collage__image image-collage__image--primary" src={image} alt="" />
+                            {transitionImage && (
+                                <img className="image-collage__image image-collage__image--transition" src={transitionImage} alt="" />
+                            )}
                         </div>
                     </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

@@ -4,13 +4,20 @@
     z-index: -2;
     pointer-events: none;
     overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    will-change: opacity;
+}
+
+.image-collage--visible {
+    opacity: 1;
 }
 
 .image-collage__track {
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(var(--collage-columns) * 100%);
+    width: var(--collage-track-width);
     min-width: 0;
     height: 100%;
     display: grid;
@@ -29,20 +36,21 @@
 
 .image-collage__frame {
     position: relative;
-    width: 120%;
+    width: var(--collage-frame-width);
     height: 100%;
-    margin-left: -10%;
+    margin-left: var(--collage-frame-offset);
     overflow: hidden;
     clip-path: polygon(
-        8.333% 0,
-        91.667% 0,
-        83.333% 100%,
+        var(--collage-frame-top-left) 0,
+        var(--collage-frame-top-right) 0,
+        var(--collage-frame-bottom-right) 100%,
         0 100%
     );
 }
 
 .image-collage__frame img {
-    position: relative;
+    position: absolute;
+    inset: 0;
     width: 108%;
     margin-left: -4%;
     min-width: 0;
@@ -51,11 +59,28 @@
     object-fit: cover;
     object-position: center;
     filter: contrast(1.02) saturate(0.9) grayscale(10%);
+    transition: opacity 0.9s ease;
+}
+
+.image-collage__image--primary {
+    opacity: 1;
+}
+
+.image-collage__image--transition {
+    opacity: 0;
 }
 
 .image-collage__tile:nth-child(odd) .image-collage__frame img {
     transform: translate3d(var(--collage-parallax-offset, 0px), 0, 0);
     will-change: transform;
+}
+
+.image-collage--transitioning .image-collage__image--primary {
+    opacity: 0;
+}
+
+.image-collage--transitioning .image-collage__image--transition {
+    opacity: 1;
 }
 
 .image-collage__tile::after {
@@ -69,8 +94,8 @@
     clip-path: polygon(
         100% 0,
         100% var(--collage-separator-width),
-        calc(90% + var(--collage-separator-width)) 100%,
-        90% 100%
+        calc(var(--collage-diagonal-bottom) + var(--collage-separator-width)) 100%,
+        var(--collage-diagonal-bottom) 100%
     );
 }
 

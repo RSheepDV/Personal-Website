@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Rubik:300,400,500i,600,700,900,900i');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
 
 App{
     padding: 0;
@@ -16,45 +17,8 @@ App{
     /*justify-content: space-between;*/
 }
 
-.sidebar {
-    position: fixed;
-    left: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-}
-
-.sidebar.sidebar-visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.sidebar a {
-    color: #d7f3ff;
-    text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    transition: opacity 0.2s ease;
-}
-
-.sidebar a:hover {
-    opacity: 0.75;
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        left: 1rem;
-    }
-}
-
 #title{
+    position: relative;
     text-align: center;
     display: flex;
     flex-grow: 1;
@@ -71,31 +35,71 @@ App{
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 5;
 }
 
-.title-ring {
+.title-entry-button {
     position: absolute;
-    top: 50%;
+    top: calc(50% + 23vh);
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(105vh, 120vw);
-    aspect-ratio: 1 / 1;
-    pointer-events: none;
-    z-index: 3;
-    animation: ring-rotate 30s linear infinite reverse;
-}
-
-.title-ring svg {
-    width: 100%;
-    height: 100%;
-}
-
-.title-ring-text {
-    fill: #d7f3ffaa;
-    font-size: 13px;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.22em;
+    z-index: 5;
+    margin: 0;
+    padding: 0.65rem 1.4rem;
+    border: 0;
+    color: #d7f3ff;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Pixelify Sans', monospace;
+    font-size: clamp(1rem, 7vw, 3rem);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
     text-transform: uppercase;
+    transition: color 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+    transform: translateX(-50%);
+}
+
+.title-entry-button:hover {
+    color: #ffffff;
+    text-shadow:
+        0 0 0.35rem rgba(215, 243, 255, 0.9),
+        0 0 1rem rgba(111, 203, 255, 0.8);
+    transform: translateX(-50%) translateY(-2px);
+}
+
+.title-entry-button:focus-visible {
+    outline: none;
+}
+
+.comment-stream {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.comment-stream__text {
+    position: absolute;
+    top: var(--comment-top);
+    left: 0;
+    white-space: nowrap;
+    color: rgb(255 215 215 / 0.2);
+    font-family: 'Pixelify Sans', monospace;
+    font-size: clamp(0.95rem, 3vw, 2.6rem);
+    letter-spacing: 0.08em;
+    /*-webkit-text-stroke: 0.08em #000;*/
+    paint-order: stroke fill;
+    /*text-shadow: 0 0 0.75rem rgba(111, 203, 255, 0.4);*/
+    animation: comment-fly var(--comment-duration) linear var(--comment-delay) infinite;
+}
+
+@keyframes comment-fly {
+    from {
+        transform: translate3d(100vw, 0, 0);
+    }
+    to {
+        transform: translate3d(-100%, 0, 0);
+    }
 }
 
 .title-flip {
@@ -103,7 +107,8 @@ App{
     min-height: 16vh;
     perspective: 1200px;
     position: relative;
-    z-index: 2;
+    z-index: 5;
+    container-type: inline-size;
 }
 
 .title-flip-button {
@@ -149,32 +154,28 @@ App{
 
 .title-face-back {
     transform: rotateX(180deg);
-    font-size: clamp(2rem, 6vw, 4.5rem);
+    box-sizing: border-box;
+    padding: 0 1rem;
+    font-size: clamp(1rem, 8cqw, 4.5rem);
     font-weight: 400;
     font-family: 'JetBrains Mono', monospace;
     letter-spacing: 0.02em;
     line-height: 1.1;
     gap: 0.25em;
+    white-space: nowrap;
     text-shadow: 0 0 1.25rem rgba(215, 243, 255, 0.18);
 }
 
-.code-token-name {
-    color: #61dafb;
+.title-cursor {
+    color: #d7f3ff;
+    animation: title-cursor-blink 1s steps(1, end) infinite;
 }
 
-.code-token-alias {
-    color: #c792ea;
-}
-
-.code-token-surname {
-    color: #c3e88d;
-}
-
-@keyframes ring-rotate {
-    from {
-        transform: translate(-50%, -50%) rotate(0deg);
+@keyframes title-cursor-blink {
+    0%, 50% {
+        opacity: 1;
     }
-    to {
-        transform: translate(-50%, -50%) rotate(360deg);
+    51%, 100% {
+        opacity: 0;
     }
 }

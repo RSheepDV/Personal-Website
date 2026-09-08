@@ -1,5 +1,5 @@
-import {Canvas} from "@react-three/fiber";
-import React, {useMemo, useState} from 'react'
+import {Canvas, useFrame} from "@react-three/fiber";
+import React, {useMemo, useRef, useState} from 'react'
 import './canvasScene.css'
 import {useEffect} from "react";
 import {useGLTF} from "@react-three/drei";
@@ -7,6 +7,16 @@ import * as THREE from "three";
 
 function AnimatedScene(){
     const { nodes } = useGLTF('/character.glb')
+    const modelRef = useRef(null);
+
+    useFrame(({ clock }) => {
+        if (modelRef.current) {
+            const time = clock.getElapsedTime();
+
+            modelRef.current.position.x = Math.sin(time * 0.35) * 0.015;
+            modelRef.current.position.y = Math.cos(time * 0.45) * 0.01;
+        }
+    });
 
     const headMaterial = useMemo(
         () => new THREE.MeshStandardMaterial({
@@ -19,8 +29,10 @@ function AnimatedScene(){
     )
 
     const blackMaterial = useMemo(
-        () => new THREE.MeshBasicMaterial({
-            color: '#000000',
+        () => new THREE.MeshStandardMaterial({
+            color: '#737373',
+            roughness: 0.4,
+            metalness: 0.8,
             side: THREE.FrontSide,
         }),
         []
@@ -36,7 +48,9 @@ function AnimatedScene(){
 
     return(
         <group
+            ref={modelRef}
             rotation={[0, 0, 0]}
+            position={[0, 0, -0.25]}
         >
             <mesh
                 castShadow
@@ -62,7 +76,45 @@ function AnimatedScene(){
     );
 }
 
-function CanvasScene() {
+function SceneLighting({ titleTurn }) {
+    const lightRefs = useRef([]);
+    const targetLightColor = useMemo(() => new THREE.Color(), []);
+
+    useFrame((_, delta) => {
+        targetLightColor.set(titleTurn % 2 === 0 ? '#dff4ff' : '#d5ffb3');
+        const transitionSpeed = 4;
+        const transitionAmount = 1 - Math.exp(-transitionSpeed * delta);
+
+        lightRefs.current.forEach((light) => {
+            if (light) {
+                light.color.lerp(targetLightColor, transitionAmount);
+            }
+        });
+    });
+
+    return (
+        <>
+            <directionalLight
+                ref={(light) => {
+                    lightRefs.current[0] = light;
+                }}
+                color="#dff4ff"
+                intensity={0.5}
+                position={[0, 1, -0.3]}
+            />
+            <directionalLight
+                ref={(light) => {
+                    lightRefs.current[1] = light;
+                }}
+                color="#dff4ff"
+                intensity={0.5}
+                position={[0, -1, -0.3]}
+            />
+        </>
+    );
+}
+
+function CanvasScene({ titleTurn }) {
 
     const [resizeFactor, setResizeFactor] = useState(1);
 
@@ -95,8 +147,7 @@ function CanvasScene() {
                 style={{ pointerEvents: 'none' }}
             >
                 <ambientLight intensity={0} />
-                <directionalLight color="#dff4ff" intensity={0.5} position={[0, 1, -0.3]}/>
-                <directionalLight color="#dff4ff" intensity={0.5} position={[0, -1, -0.3]}/>
+                <SceneLighting titleTurn={titleTurn} />
                 <AnimatedScene/>
             </Canvas>
         </div>
