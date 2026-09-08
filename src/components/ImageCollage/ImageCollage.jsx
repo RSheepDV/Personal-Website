@@ -6,7 +6,7 @@ function ImageCollage({
     columns = images.length,
     duration = 45,
     parallaxStrength = 18,
-    separatorWidth = '1rem',
+    separatorWidth = '3rem',
 }) {
     const imageSet = Array.from(
         { length: columns },
