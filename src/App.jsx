@@ -1,5 +1,6 @@
 
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 import './App.css'
 import './crtOverlay.css'
 import CanvasScene from "./models/canvasScene.jsx";
@@ -83,5 +84,10 @@ function App() {
         </>
     );
 }
+
+LivePageContent.propTypes = {
+    titleTurn: PropTypes.number.isRequired,
+    setTitleTurn: PropTypes.func.isRequired,
+};
 
 export default App

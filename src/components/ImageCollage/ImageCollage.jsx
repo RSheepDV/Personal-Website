@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
 import './ImageCollage.css'
 
 const designImageModules = import.meta.glob(
@@ -45,7 +46,7 @@ function ImageCollage({
     const frameWidth = 100 + slant * 2;
     const tileRefs = useRef([]);
     const previousLefts = useRef([]);
-    const imageStrengths = useRef([]);
+    const sharedParallaxStrength = Math.max(0, maxParallaxStrength);
     const collageStyle = {
         '--collage-total-tiles': repeatedImages.length,
         '--collage-track-width': `${(repeatedImages.length / visibleColumns) * 100}%`,
@@ -79,19 +80,21 @@ function ImageCollage({
                 const isEnteringFromRight = previousLeft === undefined
                     ? tileRect.left <= viewportRight
                     : previousLeft > viewportRight && tileRect.left <= viewportRight;
-                const minStrength = Math.max(0, Math.min(minParallaxStrength, maxParallaxStrength));
-                const maxStrength = Math.max(minStrength, maxParallaxStrength);
-
-                if (isEnteringFromRight && imageStrengths.current[index] === undefined) {
-                    imageStrengths.current[index] = minStrength
-                        + Math.random() * (maxStrength - minStrength);
-                }
+                const hasParallax = index % 2 === 1;
+                const centeredAtViewport = Math.abs(distanceFromCenter) < 0.04;
+                const parallaxOffset = centeredAtViewport || !hasParallax
+                    ? 0
+                    : distanceFromCenter * sharedParallaxStrength;
 
                 tile.style.setProperty(
                     '--collage-parallax-offset',
-                    `${distanceFromCenter * (imageStrengths.current[index] || 0)}px`
+                    `${parallaxOffset}px`
                 );
                 previousLefts.current[index] = tileRect.left;
+
+                if (isEnteringFromRight && !hasParallax) {
+                    tile.style.setProperty('--collage-parallax-offset', '0px');
+                }
             });
 
             frameId = requestAnimationFrame(updateParallax);
@@ -100,7 +103,7 @@ function ImageCollage({
         frameId = requestAnimationFrame(updateParallax);
 
         return () => cancelAnimationFrame(frameId);
-    }, [minParallaxStrength, maxParallaxStrength, repeatedImages.length]);
+    }, [repeatedImages.length, sharedParallaxStrength]);
 
     return (
         <div
@@ -135,5 +138,19 @@ function ImageCollage({
         </div>
     );
 }
+
+ImageCollage.propTypes = {
+    images: PropTypes.arrayOf(PropTypes.string),
+    folder: PropTypes.string,
+    transitionFolder: PropTypes.string,
+    columns: PropTypes.number,
+    duration: PropTypes.number,
+    minParallaxStrength: PropTypes.number,
+    maxParallaxStrength: PropTypes.number,
+    separatorWidth: PropTypes.string,
+    diagonalSlant: PropTypes.number,
+    visible: PropTypes.bool,
+    transitionActive: PropTypes.bool,
+};
 
 export default ImageCollage

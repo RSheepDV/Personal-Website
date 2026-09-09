@@ -1,5 +1,7 @@
+/* eslint-disable react/no-unknown-property */
 import {Canvas, useFrame} from "@react-three/fiber";
 import React, {useMemo, useRef, useState} from 'react'
+import PropTypes from 'prop-types'
 import './canvasScene.css'
 import {useEffect} from "react";
 import {useGLTF} from "@react-three/drei";
@@ -153,6 +155,19 @@ function CanvasScene({ titleTurn }) {
         </div>
     )
 }
+
+AnimatedScene.propTypes = {
+    reduceMotion: PropTypes.bool,
+};
+
+SceneLighting.propTypes = {
+    titleTurn: PropTypes.number.isRequired,
+    reduceMotion: PropTypes.bool,
+};
+
+CanvasScene.propTypes = {
+    titleTurn: PropTypes.number.isRequired,
+};
 
 useGLTF.preload('/character.glb')
 
