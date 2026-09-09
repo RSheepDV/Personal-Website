@@ -74,7 +74,7 @@ function App() {
 
     return (
         <>
-            <CanvasScene titleTurn={titleTurn}/>
+            {/*<CanvasScene titleTurn={titleTurn}/>*/}
             <LivePageContent
                 titleTurn={titleTurn}
                 setTitleTurn={setTitleTurn}
